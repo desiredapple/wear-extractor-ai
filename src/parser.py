@@ -1,10 +1,10 @@
-import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
 import requests
 import random
+import time
 import os
 
 options = uc.ChromeOptions()
@@ -44,7 +44,7 @@ for k in range(1, 14):
     wait.until(EC.presence_of_element_located((By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')))
     page_catalog = [link.get_attribute('href') for link in browser.find_elements(By.XPATH,'//a[contains(@class, "x-product-card__pic-catalog")]')]
 
-    for item in page_catalog[:2]:
+    for item in page_catalog:
 
         browser.get(item)
 
