@@ -2,6 +2,7 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import requests
 import time
 import os
@@ -33,11 +34,12 @@ for item in page_catalog:
             os.mkdir("data")
             os.mkdir("data/lamoda")
 
-        time.sleep(5)
+        time.sleep(4)
 
         images = browser.find_elements(By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')
         if not images:
             images = browser.find_elements(By.XPATH,'//img[contains(@class, "_photoAverage_9qw58_22")]')
+
         cur_dir = f"data/lamoda/{browser.title.split()[0]}"
         if not os.path.isdir(cur_dir):
             os.mkdir(cur_dir)
@@ -45,6 +47,8 @@ for item in page_catalog:
         i = 0
         for img in images:
             src = img.get_attribute('src')
+            if src.find('&') != -1:
+                src = src[:src.find('&')]
             
             if os.listdir(cur_dir):
                 i = max([int(el[el.find('_') + 1 : el.find('.')]) for el in os.listdir(cur_dir)])
