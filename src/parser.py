@@ -17,44 +17,42 @@ browser.get("https://www.lamoda.ru/c/355/clothes-zhenskaya-odezhda/?sitelink=top
 
 time.sleep(7)
 
-catalog_elements = browser.find_elements(By.XPATH,'//div[contains(@class, "gridItem")]')
-catalog_links = [(link.find_element(By.XPATH, '//a[contains(@class, "x-product-card__pic")]')).get_attribute('href') for link in catalog_elements]
+page_catalog = [link.get_attribute('href') for link in browser.find_elements(By.XPATH,'//a[contains(@class, "x-product-card__pic-catalog")]')]
 
-print(catalog_links)
-# for item in catalog:
+for item in page_catalog:
 
-#     browser.get(item)
+    browser.get(item)
 
-#     try:
-#         reviews_button = WebDriverWait(browser, 10).until(
-#             EC.element_to_be_clickable((By.XPATH, '//span[contains(@class, "ui-product-page-reviews-tab") and contains(text(), "Отзывы")]'))
-#         )
-#         reviews_button.click()
+    try:
+        reviews_button = WebDriverWait(browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//span[contains(@class, "ui-product-page-reviews-tab") and contains(text(), "Отзывы")]'))
+        )
+        reviews_button.click()
 
-#         if not os.path.isdir("data"):
-#             os.mkdir("data")
+        if not os.path.isdir("data"):
+            os.mkdir("data")
 
-#         time.sleep(4)
+        time.sleep(4)
 
-#         images = browser.find_elements(By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')
+        images = browser.find_elements(By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')
         
-#         for i, img in enumerate(images):
-#             cur_dir = f"data/{browser.title.split()[0]}"
-#             src = img.get_attribute('src')
+        for i, img in enumerate(images):
+            cur_dir = f"data/{browser.title.split()[0]}"
+            src = img.get_attribute('src')
             
-#             if not os.path.isdir(cur_dir):
-#                 os.mkdir(cur_dir)
-#             if src:
-#                 index = src.rfind('.')
-#                 filename = f"{cur_dir}/sample_{i}.{src[index:]}"
+            if not os.path.isdir(cur_dir):
+                os.mkdir(cur_dir)
+            if src:
+                index = src.rfind('.')
+                filename = f"{cur_dir}/sample_{i}.{src[index:]}"
                 
-#             img_data = requests.get(src).content
-#             with open(filename, 'wb') as handler:
-#                 handler.write(img_data)
+            img_data = requests.get(src).content
+            with open(filename, 'wb') as handler:
+                handler.write(img_data)
 
-#     except Exception as e:
-#         print("error:", e)
+    except Exception as e:
+        print("error:", e)
 
-# ### END LAMODA SECTION
+### END LAMODA SECTION
 
 browser.quit()
