@@ -1,3 +1,4 @@
+import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -33,7 +34,7 @@ options.add_experimental_option(
 )
 
 browser = uc.Chrome(options=options, log_level=3)
-wait = WebDriverWait(browser, 10)
+wait = WebDriverWait(browser, 7)
 
 ### LAMODA SECTION
 for k in range(1, 14):
@@ -43,7 +44,7 @@ for k in range(1, 14):
     wait.until(EC.presence_of_element_located((By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')))
     page_catalog = [link.get_attribute('href') for link in browser.find_elements(By.XPATH,'//a[contains(@class, "x-product-card__pic-catalog")]')]
 
-    for item in page_catalog:
+    for item in page_catalog[:2]:
 
         browser.get(item)
 
@@ -57,11 +58,11 @@ for k in range(1, 14):
                 os.mkdir("data")
                 os.mkdir("data/lamoda")
 
-            wait.until(EC.presence_of_element_located((By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')))
-
+            time.sleep(1)
+            
             images = browser.find_elements(By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')
             if not images:
-                images = browser.find_elements(By.XPATH,'//img[contains(@class, "_photoAverage_9qw58_22")]')
+                images = browser.find_elements(By.XPATH,'//img[contains(@class, "photoAverage_9qw58_22")]')
 
             cur_dir = f"data/lamoda/{browser.title.split()[0]}"
             if not os.path.isdir(cur_dir):
@@ -72,6 +73,8 @@ for k in range(1, 14):
             if len(images) > 5:
                 random.shuffle(images)
                 images = images[:5]
+            elif not images:
+                continue
             
             for img in images:
                 src = img.get_attribute('src')
