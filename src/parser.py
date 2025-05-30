@@ -1,23 +1,45 @@
+import os
+import requests
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-import requests
-import time
-import os
 
 options = uc.ChromeOptions()
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
 options.add_argument("--start-maximized")
+options.add_argument("--disable-background-networking")
+options.add_argument("--disable-sync")
+options.add_argument("--metrics-recording-only")
+options.add_argument("--disable-default-apps")
+options.add_argument("--disable-extensions")
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_experimental_option(
+        "prefs", {
+            "credentials_enable_service": False,
+            "profile.password_manager_enabled": False,
+            "profile.managed_default_content_settings.images": 2,
+            "profile.managed_default_content_settings.stylesheets": 2,
+            "profile.managed_default_content_settings.plugins": 2,
+            "profile.managed_default_content_settings.popups": 2,
+            "profile.managed_default_content_settings.geolocation": 2,
+            "profile.managed_default_content_settings.notifications": 2,
+            "profile.managed_default_content_settings.media_stream": 2 
+        }
+)
 
-browser = uc.Chrome(options=options)
+browser = uc.Chrome(options=options, log_level=3)
+wait = WebDriverWait(browser, 10)
 
 ### LAMODA SECTION 
 
 browser.get("https://www.lamoda.ru/c/355/clothes-zhenskaya-odezhda/?sitelink=topmenuW&l=3")
 
-time.sleep(3)
 
+wait.until(EC.presence_of_element_located((By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')))
 page_catalog = [link.get_attribute('href') for link in browser.find_elements(By.XPATH,'//a[contains(@class, "x-product-card__pic-catalog")]')]
 
 for item in page_catalog:
@@ -25,7 +47,7 @@ for item in page_catalog:
     browser.get(item)
 
     try:
-        reviews_button = WebDriverWait(browser, 15.).until(
+        reviews_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, '//span[contains(@class, "ui-product-page-reviews-tab") and contains(text(), "Отзывы")]'))
         )
         reviews_button.click()
@@ -34,7 +56,7 @@ for item in page_catalog:
             os.mkdir("data")
             os.mkdir("data/lamoda")
 
-        time.sleep(4)
+        wait.until(EC.presence_of_element_located((By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')))
 
         images = browser.find_elements(By.XPATH,'//img[contains(@class, "ui-reviews-gallery")]')
         if not images:
