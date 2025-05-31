@@ -39,16 +39,18 @@ class Parser:
         self.wait = WebDriverWait(self.browser, 5)
 
     def parse_all(self):
+            
         for k in range(1, 8):
             self.browser.get(
                 f"https://www.lamoda.ru/c/355/clothes-zhenskaya-odezhda/?sitelink=topmenuW&l=3&page={k}")
 
             self.wait.until(EC.presence_of_element_located(
                 (By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')))
+
             page_catalog = [link.get_attribute('href') for link in self.browser.find_elements(
                 By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')]
 
-            Parser.parse_lamoda(self, page_catalog)
+            Parser.__parse_lamoda(self, page_catalog)
 
         for k in range(1, 8):
             self.browser.get(
@@ -56,64 +58,73 @@ class Parser:
 
             self.wait.until(EC.presence_of_element_located(
                 (By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')))
+
             page_catalog = [link.get_attribute('href') for link in self.browser.find_elements(
                 By.XPATH, '//a[contains(@class, "x-product-card__pic-catalog")]')]
 
-            Parser.parse_lamoda(self.browser, page_catalog)
+            Parser.__parse_lamoda(self.browser, page_catalog)
         self.browser.quit()
 
-    def parse_lamoda(self, page_catalog):
+    def __parse_lamoda(self, page_catalog):
+        cur_dir = "data/lamoda"
+        
+        if not os.path.isdir(f"{cur_dir}/showcase"):
+            os.makedirs(f"{cur_dir}/showcase")
+        if not os.path.isdir(f"{cur_dir}/review_gallery"):
+            os.makedirs(f"{cur_dir}/review_gallery")
+
         for item in page_catalog:
 
             self.browser.get(item)
-            cur_dir = f"data/lamoda/{self.browser.title.split()[0]}"
+            category = self.browser.title.split()[0]
 
             reviews_button = self.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, '//span[contains(@class, "ui-product-page-reviews-tab") and contains(text(), "Отзывы")]'))
             )
             reviews_button.click()
+#           TODO : place after images list creation to avoid empty folders 
+            if not os.path.isdir(f"{cur_dir}/showcase/{category}") and not os.path.isdir(f"{cur_dir}/review_gallery/{category}"):
+                os.mkdir(f"{cur_dir}/showcase/{category}")
+                os.mkdir(f"{cur_dir}/review_gallery/{category}")
 
-            if not os.path.isdir("data/lamoda"):
-                os.makedirs("data/lamoda")
-
-            if not os.path.isdir(cur_dir):
-                os.mkdir(cur_dir)
-
-
-            time.sleep(1)
+            time.sleep(3)
 
             if self.browser.find_elements(
                     By.XPATH, '//img[contains(@class, "ui-reviews-gallery")]'):
-                images_links = self.browser.find_elements(
+                reviews_images_links = self.browser.find_elements(
                     By.XPATH, '//img[contains(@class, "ui-reviews-gallery")]')
-            elif self.browser.find_elements(
-                    By.XPATH, '//img[contains(@class, "photoAverage_9qw58_22")]'):
-                images_links = self.browser.find_elements(
-                    By.XPATH, '//img[contains(@class, "photoAverage_9qw58_22")]')
             else:
-                continue
+                reviews_images_links = self.browser.find_elements(
+                    By.XPATH, '//img[contains(@class, "photoAverage_9qw58_22")]')
+                
+            if len(reviews_images_links) > 5:
+                random.shuffle(reviews_images_links)
+                reviews_images_links = reviews_images_links[:5]
 
+            showcase_images_links = self.browser.find_elements(By.XPATH, '//div[contains(@class, "ui-product-page-gallery")]')[:3]
+            showcase_images_links = [elem.find_element(By.TAG_NAME, 'img') for elem in showcase_images_links]
 
-            if len(images_links) > 5:
-                random.shuffle(images_links)
-                images_links = images_links[:5]
-
-            for img in images_links:
+            
+            for img in (reviews_images_links + showcase_images_links):
+                image_type = "review_gallery" if img in reviews_images_links else "showcase"
+                print(img, image_type)
                 src = img.get_attribute('src')
                 if src.find('&') != -1:
                     src = src[:src.find('&')]
 
                 i = 0
-                if os.listdir(cur_dir):
+                if os.listdir(f"{cur_dir}/{image_type}/{category}"):
                     i = max([int(el[el.find('_') + 1: el.find('.')])
-                            for el in os.listdir(cur_dir)])
+                            for el in os.listdir(f"{cur_dir}/{image_type}/{category}")])
 
-                if src:
-                    extension_index = src.rfind('.')
-                    filename = f"{cur_dir}/sample_{i + 1}.{src[extension_index + 1:]}"
+                extension_index = src.rfind('.')
+                filename = f"{cur_dir}/{image_type}/{category}/sample_{i + 1}.{src[extension_index + 1:]}"
 
                 img_data = requests.get(src).content
 
                 with open(filename, 'wb') as handler:
                     handler.write(img_data)
+
+a = Parser()
+a.parse_all()
