@@ -36,7 +36,7 @@ class Parser:
             }
         )
         self.browser = uc.Chrome(options=options, log_level=3)
-        self.wait = WebDriverWait(self.browser, 6)
+        self.wait = WebDriverWait(self.browser, 7)
 
     def parse_all(self):
 
@@ -83,13 +83,13 @@ class Parser:
             )
             reviews_button.click()
 
-            time.sleep(2)
+            time.sleep(3)
 
             showcase_images_links = self.browser.find_elements(
                 By.XPATH, '//div[contains(@class, "ui-product-page-gallery")]')[:3]
             showcase_images_links = [elem.find_element(
                 By.TAG_NAME, 'img') for elem in showcase_images_links]
-            
+
             if self.browser.find_elements(
                     By.XPATH, '//img[contains(@class, "ui-reviews-gallery")]'):
                 reviews_images_links = self.browser.find_elements(
@@ -102,24 +102,32 @@ class Parser:
                 random.shuffle(reviews_images_links)
                 reviews_images_links = reviews_images_links[:5]
 
-
-            if len(showcase_images_links) and not os.path.isdir(f"{cur_dir}/showcase/{category}"):
+            if len(showcase_images_links) > 1 and not os.path.isdir(f"{cur_dir}/showcase/{category}"):
                 os.mkdir(f"{cur_dir}/showcase/{category}")
 
-            if len(reviews_images_links) and not os.path.isdir(f"{cur_dir}/review_gallery/{category}"):
+            if len(reviews_images_links) > 1 and not os.path.isdir(f"{cur_dir}/review_gallery/{category}"):
                 os.mkdir(f"{cur_dir}/review_gallery/{category}")
 
             for img in (showcase_images_links + reviews_images_links):
-                image_type = "review_gallery" if img in reviews_images_links else "showcase"
 
                 src = img.get_attribute('src')
                 if src.find('&') != -1:
                     src = src[:src.find('&')]
 
+                image_type = "review_gallery" if img in reviews_images_links else "showcase"
+
+                if os.path.exists(f"{cur_dir}/{image_type}/{category}/{category}_{image_type}_stats_log.txt"):
+                    with open(f"{cur_dir}/{image_type}/{category}/{category}_{image_type}_stats_log.txt", 'r') as handler:
+                        if src in [str.split()[1] for str in handler.readlines()]:
+                            continue
+
                 i = 0
-                if os.listdir(f"{cur_dir}/{image_type}/{category}"):
-                    i = max([int(el[el.find('_') + 1: el.find('.')])
-                            for el in os.listdir(f"{cur_dir}/{image_type}/{category}")])
+                if len([filename for filename in os.listdir(f"{cur_dir}/{image_type}/{category}") if filename.split('_')[-1].split('.')[0].isdigit()]) > 0:
+                    i = max([int(el.split('_')[-1].split('.')[0]) for el in os.listdir(
+                        f"{cur_dir}/{image_type}/{category}") if el.split('_')[-1].split('.')[0].isdigit()])
+
+                with open(f"{cur_dir}/{image_type}/{category}/{category}_{image_type}_stats_log.txt", 'a') as handler:
+                    handler.write(f"{i}. {src}\n")
 
                 extension_index = src.rfind('.')
                 filename = f"{cur_dir}/{image_type}/{category}/sample_{i + 1}.{src[extension_index + 1:]}"
