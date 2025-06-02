@@ -1,4 +1,3 @@
-import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,6 +9,15 @@ import os
 
 
 class Parser:
+    def get_category(self, item_name: str, categories: dict) -> str:
+        item_name = item_name.lower()
+        
+        for category, keywords in categories.items():
+            for keyword in keywords:
+                if keyword.lower() in item_name:
+                    return category
+
+        return "None"
 
     def __init__(self):
         options = uc.ChromeOptions()
@@ -39,6 +47,40 @@ class Parser:
         self.browser = uc.Chrome(options=options, log_level=3)
         self.wait = WebDriverWait(self.browser, 15)
         self.actions = ActionChains(self.browser)
+        self.categories = {
+            "Shirt, Blouse": ["Блузка", "Рубашка",
+                            "Блузка-боди"],
+            "Top, T-shirt, Sweatshirt": ["Лонгслив", "Рашгард", "Свитшот", "Топ", "Лонгслив спортивный",
+                                        "Футболка", "Футболка спортивная", "Футболка-поло", "Термофутболка", "Толстовка", "Толстовка спортивная",
+                                        "Худи", "Майка спортивная", "Термолонгслив", "Манишка", "Термоводолазка"],
+            "Sweater": ["Свитер", "Кофта"],
+            "Cardigan": ["Водолазка", "Джемпер", "Кардиган", "Джемпер спортивный", "Пуловер"],
+            "Jacket": ["Анорак", "Бомбер", "Жакет", "Куртка", "Пиджак", "Куртка спортивная", "Пуховик", "Ветровка", "Дубленка",
+                    "Косуха", "Парка", "Шуба искусственная"],
+            "Vest": ["Жилет"],
+            "Pants": ["Бриджи", "Бриджи спортивные", "Брюки", "Брюки спортивные", "Велосипедки", "Джеггинсы"
+                    "Джинсы", "Леггинсы", "Тайтсы", "Капри"],
+            "Shorts": ["Бордшорты", "Шорты", "Шорты спортивные", "Бермуды"],
+            "Skirt": ["Юбка спортивная", "Юбка"],
+            "Coat": ["Пальто", "Полупальто"],
+            "Dress": ["Платье", "Сарафан", "Платье спортивное", "Туника"],
+            "Jumpsuit": ["Комбинезон", "Полукомбинезон"],
+            "Cape": ["Плащ", "Тренчкот"],
+            "Gloves": ["Перчатки", "Варежки", "Митенки"],
+            "Shoes": ["Босоножки", "Сандалии", "Сабо", "Полусапожки",
+                    "Мокасины", "Лоферы", "Балетки", "Кеды", "Туфли", "Ботинки", "Полуботинки", "Мюли", "Кроссовки", "Ледоступы", "Резиновые сапоги", "Сапоги", "Ботильоны",
+                    "Угги", "Ботфорты", "Дутики"],
+            "Socks": ["Носки", "Подследники", "Термоноски"],
+            "Stockings": ["Гольфы", "Колготки", "Термоколготки", "Гетры"],
+            "Underwear": ["Боди", "Кальсоны", "Комплект белья", "Леггинсы ч/н", "Майка бельевая",
+                        "Неглиже", "Ночная сорочка", "Пижама", "Плавки", "Термободи", "Трусы", "Кальсоны спортивные", "Корсет", "Пеньюар"],
+            "Bra": ["Бюстгальтер", "Лиф для купальника", "Топ спортивный"],
+            "Hat": ["Балаклава", "Бейсболка", "Панама", "Кепи", "Шапка", "Шапка-ушанка", "Шляпа", "Шапка-шлем", "Козырек", "Берет"],
+            "Scarf": ["Платок", "Палантин", "Шарф", "Снуд"],
+            "Belt": ["Ремень", "Пояс"],
+            "Sunglasses": ["Солнцезащитные очки"],
+            "Bag": ["Рюкзак", "Сумка", "Сумка-шоппер", "Сумка спортивная"]
+        }
 
     def parse_all(self):
         parsing_list = ["https://www.wildberries.ru/brands/7049-mark-formelle/all",
@@ -80,7 +122,10 @@ class Parser:
 
                 page_catalog = [link.get_attribute('href') for link in self.browser.find_elements(
                     By.XPATH, '//a[contains(@class, "product-card__link")]')]
-
+                
+                if len(page_catalog) < 80:
+                    break
+                    
                 self.__parse_wildberries(page_catalog)
 
         self.browser.quit()
@@ -89,10 +134,10 @@ class Parser:
 
         cur_dir = "data/wildberries"
 
-        if not os.path.isdir(f"{cur_dir}/showcase") and not os.path.isdir(f"{cur_dir}/review_gallery") and not os.path.isdir("log"):
+        if not os.path.isdir(f"{cur_dir}/showcase") and not os.path.isdir(f"{cur_dir}/review_gallery") and not os.path.isdir("logs"):
             os.makedirs(f"{cur_dir}/showcase")
             os.makedirs(f"{cur_dir}/review_gallery")
-            os.mkdir("log")
+            os.mkdir("logs")
 
         for item in page_catalog:
 
@@ -101,14 +146,13 @@ class Parser:
             self.wait.until(EC.presence_of_element_located((
                 By.CLASS_NAME, "product-page__link-category")))
 
-
-# ['shirt, blouse', 'top, t-shirt, sweatshirt', 'sweater', 'cardigan', 'jacket', 'vest', 'pants', 'shorts', 'skirt', 'coat',
-# 'dress', 'jumpsuit', 'cape', 'glasses', 'hat', 'headband, head covering, hair accessory', 'tie', 'glove', 'watch', 'belt',
-# 'leg warmer', 'tights, stockings', 'sock', 'shoe', 'bag, wallet', 'scarf', 'umbrella', 'hood', 'collar', 'lapel', 'epaulette',
-# 'sleeve', 'pocket', 'neckline', 'buckle', 'zipper', 'applique', 'bead', 'bow', 'flower', 'fringe', 'ribbon', 'rivet', 'ruffle', 'sequin', 'tassel']
-
             category = self.browser.find_element(
                 By.CLASS_NAME, "product-page__link-category").get_attribute("innerHTML")
+            
+            category = self.get_category(category, self.categories)
+
+            if category == "None":
+                continue
 
             showcase_images_links = self.browser.find_elements(
                 By.XPATH, '//li[contains(@class, "j-product-photo")]')[:4]
@@ -155,8 +199,8 @@ class Parser:
                                src[index:].find('/') + 1: src.rfind('/')]
                     src = src.replace(rplc, "big")
 
-                if os.path.exists(f"log/{category}_{image_type}_stats_log.txt"):
-                    with open(f"log/{category}_{image_type}_stats_log.txt", 'r') as handler:
+                if os.path.exists(f"logs/{category}_{image_type}_stats_log.txt"):
+                    with open(f"logs/{category}_{image_type}_stats_log.txt", 'r') as handler:
                         if src in [str.split()[1] for str in handler.readlines()]:
                             break
 
@@ -165,10 +209,10 @@ class Parser:
                     i = max([int(el.split('_')[-1].split('.')[0]) for el in os.listdir(
                         f"{cur_dir}/{image_type}/{category}") if el.split('_')[-1].split('.')[0].isdigit()])
 
-                with open(f"log/{category}_{image_type}_stats_log.txt", 'a') as handler:
+                with open(f"logs/{category}_{image_type}_stats_log.txt", 'a') as handler:
                     handler.write(f"{i}. {src}\n")
 
-                with open("log/stats.log", 'w') as file:
+                with open("logs/stats.log", 'w') as file:
                     stats = [f"{r} - {len(files)}\n" for r,
                              _, files in os.walk(f"./{cur_dir}")]
                     review_number = sum(
