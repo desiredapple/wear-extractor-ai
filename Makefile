@@ -9,4 +9,4 @@ parse_lamoda:
 	/home/omniscope/anaconda3/bin/python ./src/parser_lamoda.py
 
 rm:
-	rm -rfd data log
+	rm -rfd data logs
