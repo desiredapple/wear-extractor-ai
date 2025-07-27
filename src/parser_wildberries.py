@@ -1,5 +1,10 @@
-from selenium.webdriver.support import expected_conditions as EC
+"""Wildberries class-parser
+
+Parse photos from comments and gallery sections of most popular positions from certain shops listed in the code. 
+"""
+
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import undetected_chromedriver as uc
@@ -8,18 +13,13 @@ import random
 import os
 
 
-class Parser:
-    def get_category(self, item_name: str, categories: dict) -> str:
-        item_name = item_name.lower()
-        
-        for category, keywords in categories.items():
-            for keyword in keywords:
-                if keyword.lower() in item_name:
-                    return category
-
-        return "None"
-
+class WildberriesParser:
     def __init__(self):
+        """Initializes a browser instance.
+
+        The options should include built-in optimization with an initialized browser.
+        They should also specify the list of categories allowed for parsing.
+        """
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-background-networking")
@@ -47,8 +47,10 @@ class Parser:
         self.browser = uc.Chrome(options=options, log_level=3)
         self.wait = WebDriverWait(self.browser, 15)
         self.actions = ActionChains(self.browser)
+
+
         self.categories = {
-            "Shirt, Blouse": ["Блузка", "Рубашка",
+            "Shirt, Blouse": ["Блузка", "Рубашки",
                             "Блузка-боди"],
             "Top, T-shirt, Sweatshirt": ["Лонгслив", "Рашгард", "Свитшот", "Топ", "Лонгслив спортивный",
                                         "Футболка", "Футболка спортивная", "Футболка-поло", "Термофутболка", "Толстовка", "Толстовка спортивная",
@@ -74,7 +76,7 @@ class Parser:
             "Stockings": ["Гольфы", "Колготки", "Термоколготки", "Гетры"],
             "Underwear": ["Боди", "Кальсоны", "Комплект белья", "Леггинсы ч/н", "Майка бельевая",
                         "Неглиже", "Ночная сорочка", "Пижама", "Плавки", "Термободи", "Трусы", "Кальсоны спортивные", "Корсет", "Пеньюар"],
-            "Bra": ["Бюстгальтер", "Лиф для купальника", "Топ спортивный"],
+#            "Bra": ["Бюстгальтер", "Лиф для купальника", "Топ спортивный"],
             "Hat": ["Балаклава", "Бейсболка", "Панама", "Кепи", "Шапка", "Шапка-ушанка", "Шляпа", "Шапка-шлем", "Козырек", "Берет"],
             "Scarf": ["Платок", "Палантин", "Шарф", "Снуд"],
             "Belt": ["Ремень", "Пояс"],
@@ -82,7 +84,19 @@ class Parser:
             "Bag": ["Рюкзак", "Сумка", "Сумка-шоппер", "Сумка спортивная"]
         }
 
+    def get_category(self, item_name):
+        """Method to check if the category needs to be parsed."""
+        item_name = item_name.lower()
+
+        for category, keywords in self.categories.items():
+            for keyword in keywords:
+                if keyword.lower() in item_name:
+                    return category
+
+        return "None"
+
     def parse_all(self):
+        """With specified list use parser method to get exact data from the links. Use only page-logic."""
         parsing_list = ["https://www.wildberries.ru/brands/7049-mark-formelle/all",
                         "https://www.wildberries.ru/brands/1836-finn-flare/all",
                         "https://www.wildberries.ru/brands/290923899-maag/all",
@@ -91,7 +105,7 @@ class Parser:
                         "https://www.wildberries.ru/brands/befree/all",
                         "https://www.wildberries.ru/brands/mango/all",
                         "https://www.wildberries.ru/brands/baon/all",
-                        "https://www.wildberries.ru/brands/sela/all/"
+                        "https://www.wildberries.ru/brands/sela/all"
                         ]
         parsing_list_with_odezdha = ["https://www.wildberries.ru/brands/1092023-mabag-eco/odezhda/",
                                      "https://www.wildberries.ru/brands/love-republic/odezhda/",
@@ -131,16 +145,17 @@ class Parser:
         self.browser.quit()
 
     def __parse_wildberries(self, page_catalog):
-
+        """From selected page method gets photos from both of gallery and comments sections."""
         cur_dir = "data/wildberries"
 
-        if not os.path.isdir(f"{cur_dir}/showcase") and not os.path.isdir(f"{cur_dir}/review_gallery") and not os.path.isdir("logs"):
+        if not os.path.isdir(f"{cur_dir}/showcase"):
             os.makedirs(f"{cur_dir}/showcase")
+        if not os.path.isdir(f"{cur_dir}/review_gallery"):
             os.makedirs(f"{cur_dir}/review_gallery")
+        if not os.path.isdir("logs"):
             os.mkdir("logs")
 
         for item in page_catalog:
-
             self.browser.get(item)
 
             self.wait.until(EC.presence_of_element_located((
@@ -149,7 +164,7 @@ class Parser:
             category = self.browser.find_element(
                 By.CLASS_NAME, "product-page__link-category").get_attribute("innerHTML")
             
-            category = self.get_category(category, self.categories)
+            category = self.get_category(category)
 
             if category == "None":
                 continue
@@ -232,5 +247,5 @@ class Parser:
                     handler.write(img_data)
 
 
-a = Parser()
+a = WildberriesParser()
 a.parse_all()
