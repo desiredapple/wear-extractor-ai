@@ -13,6 +13,9 @@ import random
 import os
 
 
+showcase_count = 5
+review_count = 5
+
 class WildberriesParser:
     def __init__(self):
         """Initializes a browser instance.
@@ -50,40 +53,35 @@ class WildberriesParser:
 
 
         self.categories = {
-            "Shirt": ["Рубашки"],
             "Blouse": ["Блузка", "Блузка-боди"],
-            "Top": ["Топ"],
-            "Longsleeve": ["Лонгслив", "Рашгард", "Лонгслив спортивный", "Термолонгслив"],
-            "Sweatshirt, Longsleeve": ["Толстовка", "Толстовка спортивная",
-                    "Худи"],
-            "T-shirt, Polo": ["Футболка", "Футболка спортивная", "Футболка-поло", "Термофутболка", "Майка спортивная", "Манишка"],
-            "Sweater": ["Свитер", "Кофта"],
+            "Cape": ["Плащ", "Тренчкот"],
             "Cardigan": ["Водолазка", "Термоводолазка", "Джемпер", "Кардиган", "Джемпер спортивный", "Пуловер", "Свитшот"],
-            "Jacket": ["Анорак", "Бомбер", "Жакет", "Куртка", "Пиджак", "Куртка спортивная", "Ветровка", "Косуха"],
-            "Winter Jacket": ["Пуховик", "Дубленка", "Парка", "Шуба искусственная"],
-            "Vest": ["Жилет"],
-            "Pants": ["Бриджи", "Бриджи спортивные", "Брюки", "Брюки спортивные", "Велосипедки", "Джеггинсы"
-                    "Джинсы", "Леггинсы", "Тайтсы", "Капри"],
-            "Shorts": ["Бордшорты", "Шорты", "Шорты спортивные", "Бермуды"],
-            "Skirt": ["Юбка спортивная", "Юбка"],
             "Coat": ["Пальто", "Полупальто"],
             "Dress": ["Платье", "Сарафан", "Платье спортивное", "Туника"],
-            "Jumpsuit": ["Комбинезон", "Полукомбинезон"],
-            "Cape": ["Плащ", "Тренчкот"],
             "Gloves": ["Перчатки", "Варежки", "Митенки"],
-            "Shoes": ["Босоножки", "Сандалии", "Сабо", "Полусапожки",
-                    "Мокасины", "Лоферы", "Балетки", "Кеды", "Туфли", "Ботинки", "Полуботинки", "Мюли", "Кроссовки", "Ледоступы", "Резиновые сапоги", "Сапоги", "Ботильоны",
-                    "Угги", "Ботфорты", "Дутики"],
-#            "Socks": ["Носки", "Подследники", "Термоноски"],
-            "Stockings": ["Гольфы", "Колготки", "Термоколготки", "Гетры"],
-            "Underwear": ["Боди", "Кальсоны", "Комплект белья", "Леггинсы ч/н", "Майка бельевая",
-                        "Неглиже", "Ночная сорочка", "Пижама", "Плавки", "Термободи", "Трусы", "Кальсоны спортивные", "Корсет", "Пеньюар"],
-#            "Bra": ["Бюстгальтер", "Лиф для купальника", "Топ спортивный"],
             "Hat": ["Балаклава", "Бейсболка", "Панама", "Кепи", "Шапка", "Шапка-ушанка", "Шляпа", "Шапка-шлем", "Козырек", "Берет"],
+            "Jacket": ["Анорак", "Бомбер", "Жакет", "Куртка", "Пиджак", "Куртка спортивная", "Ветровка", "Косуха"],
+            "Jumpsuit": ["Комбинезон", "Полукомбинезон"],
+            "Longsleeve": ["Лонгслив", "Рашгард", "Лонгслив спортивный", "Термолонгслив"],
+            "Pants": ["Бриджи", "Бриджи спортивные", "Брюки", "Брюки спортивные", "Велосипедки", "Джеггинсы", "Джинсы", "Леггинсы", "Тайтсы", "Капри"],
             "Scarf": ["Платок", "Палантин", "Шарф", "Снуд"],
+            "Shirt": ["Рубашки"],
+            "Shorts": ["Бордшорты", "Шорты", "Шорты спортивные", "Бермуды"],
+            "Skirt": ["Юбка спортивная", "Юбка"],
+            "Sweater": ["Свитер", "Кофта"],
+            "Sweatshirt": ["Толстовка", "Толстовка спортивная", "Худи"],
+            "T-shirt, Polo": ["Футболки", "Футболка спортивная", "Футболка-поло", "Термофутболка", "Майка спортивная", "Манишка"],
+            "Top": ["Топ"],
+            "Underwear": ["Боди", "Кальсоны", "Комплект белья", "Леггинсы ч/н", "Майка бельевая", "Неглиже", "Ночная сорочка", "Пижама", "Плавки", "Термободи", "Трусы", "Кальсоны спортивные", "Корсет", "Пеньюар"],
+            "Vest": ["Жилеты"],
+            "Winter Jacket": ["Пуховик", "Дубленка", "Парка", "Шуба искусственная"],
             "Belt": ["Ремень", "Пояс"],
-#            "Sunglasses": ["Солнцезащитные очки"],
+            "Shoes": ["Босоножки", "Сандалии", "Сабо", "Полусапожки", "Мокасины", "Лоферы", "Балетки", "Кеды", "Туфли", "Ботинки", "Полуботинки", "Мюли", "Кроссовки", "Ледоступы", "Резиновые сапоги", "Сапоги", "Ботильоны", "Угги", "Ботфорты", "Дутики"],
+            "Stockings": ["Гольфы", "Колготки", "Термоколготки", "Гетры"]
 #            "Bag": ["Рюкзак", "Сумка", "Сумка-шоппер", "Сумка спортивная"]
+#            "Bra": ["Бюстгальтер", "Лиф для купальника", "Топ спортивный"],
+#            "Socks": ["Носки", "Подследники", "Термоноски"],
+#            "Sunglasses": ["Солнцезащитные очки"],
         }
 
     def get_category(self, item_name):
@@ -160,93 +158,106 @@ class WildberriesParser:
         for item in page_catalog:
             self.browser.get(item)
 
-            self.wait.until(EC.presence_of_element_located((
-                By.CLASS_NAME, "product-page__link-category")))
+            self.wait.until(EC.visibility_of_element_located(
+                (By.XPATH, '//span[contains(@class, "categoryLinkCategory--VSJ8c")]')
+            ))
 
-            category = self.browser.find_element(
-                By.CLASS_NAME, "product-page__link-category").get_attribute("innerHTML")
-            
+            category_elem = self.browser.find_element(
+                By.XPATH, '//span[contains(@class, "categoryLinkCategory--VSJ8c")]'
+            )
+
+            category = category_elem.get_attribute("innerHTML")
+            print(f"{category}")
+
             category = self.get_category(category)
+
+            print(f"{category}")
 
             if category == "None":
                 continue
 
-            showcase_images_links = self.browser.find_elements(
-                By.XPATH, '//li[contains(@class, "j-product-photo")]')[:4]
+            item_id = item[item.find("catalog") + len("catalog") + 1 : item.rfind("/")]
+
+            print(f"{item_id}")
+
+
+            showcase_classes = self.browser.find_elements(
+                By.XPATH, '//div[contains(@class, "swiper-slide miniatureSlide--acvJc")]')[:showcase_count]
             showcase_images_links = [elem.find_element(
-                By.TAG_NAME, 'img') for elem in showcase_images_links]
+                By.TAG_NAME, 'img').get_attribute('src') for elem in showcase_classes]
 
             actions = ActionChains(self.browser)
 
             end = self.browser.find_element(
-                By.XPATH, '//div[contains(@class, "user-activity__tab-content")]')
+                By.ID, 'product-feedbacks')
 
             actions.move_to_element(end).perform()
 
-            self.wait.until(EC.presence_of_element_located(
-                (By.CLASS_NAME, "comments__content")))
 
-            reviews_images_links = self.browser.find_elements(
-                By.XPATH, '//div[contains(@class, "swiper-slide img-plug")]')
+            review_classes = self.browser.find_elements(
+                By.XPATH, '//img[contains(@class, "image--CJ2Ug")]')
 
-            reviews_images_links = [elem.find_element(
-                By.TAG_NAME, "img") for elem in reviews_images_links]
+            review_image_links = [elem.get_attribute('src') for elem in review_classes]
 
-            if len(reviews_images_links) > 5:
-                random.shuffle(reviews_images_links)
-                reviews_images_links = reviews_images_links[:5]
+            print(len(review_image_links), len(showcase_images_links))
+            print(len(set(review_image_links)), len(set(showcase_images_links)))
 
-            if len(showcase_images_links) > 0 and not os.path.isdir(f"{cur_dir}/showcase/{category}"):
-                os.mkdir(f"{cur_dir}/showcase/{category}")
+            if len(review_image_links) and len(showcase_images_links):
 
-            if len(reviews_images_links) > 0 and not os.path.isdir(f"{cur_dir}/review_gallery/{category}"):
-                os.mkdir(f"{cur_dir}/review_gallery/{category}")
+                if len(review_image_links) > review_count:
+                    random.shuffle(review_image_links)
+                    review_image_links = review_image_links[:review_count]
 
-            for img in (showcase_images_links + reviews_images_links):
+                if not os.path.isdir(f"{cur_dir}/showcase/{category}"):
+                    os.makedirs(f"{cur_dir}/showcase/{category}")
 
-                src = img.get_attribute('src')
+                if not os.path.isdir(f"{cur_dir}/review_gallery/{category}"):
+                    os.makedirs(f"{cur_dir}/review_gallery/{category}")
 
-                image_type = "review_gallery" if img in reviews_images_links else "showcase"
 
-                if image_type == "review_gallery":
-                    src = src[:src.rfind('/')] + "/fs.webp"
-                else:
-                    index = src.find("images")
-                    rplc = src[index +
-                               src[index:].find('/') + 1: src.rfind('/')]
-                    src = src.replace(rplc, "big")
+                for src in (showcase_images_links + review_image_links):
 
-                if os.path.exists(f"logs/{category}_{image_type}_stats_log.txt"):
-                    with open(f"logs/{category}_{image_type}_stats_log.txt", 'r') as handler:
-                        if src in [str.split()[1] for str in handler.readlines()]:
-                            break
+                    image_type = "review_gallery" if src in review_image_links else "showcase"
+                    
+                    if image_type == "review_gallery":
+                        src = src[:src.rfind('/')] + "/fs.webp"
+                    else:
+                        index = src.find("images")
+                        rplc = src[index +
+                                src[index:].find('/') + 1: src.rfind('/')]
+                        src = src.replace(rplc, "big")
 
-                i = 0
-                if len([filename for filename in os.listdir(f"{cur_dir}/{image_type}/{category}") if filename.split('_')[-1].split('.')[0].isdigit()]) > 0:
-                    i = max([int(el.split('_')[-1].split('.')[0]) for el in os.listdir(
-                        f"{cur_dir}/{image_type}/{category}") if el.split('_')[-1].split('.')[0].isdigit()])
+                    if os.path.exists(f"logs/{category}_{image_type}_stats_log.txt"):
+                        with open(f"logs/{category}_{image_type}_stats_log.txt", 'r') as handler:
+                            if src in [str.split()[1] for str in handler.readlines()]:
+                                continue
 
-                with open(f"logs/{category}_{image_type}_stats_log.txt", 'a') as handler:
-                    handler.write(f"{i}. {src}\n")
+                    i = 0 
+                    if len([filename for filename in os.listdir(f"{cur_dir}/{image_type}/{category}") if filename.split('_')[-1].split('.')[0].isdigit()]) > 0: 
+                        i = max([int(el.split('_')[-1].split('.')[0]) for el in os.listdir(
+                            f"{cur_dir}/{image_type}/{category}") if el.split('_')[-1].split('.')[0].isdigit()])
 
-                with open("logs/stats.log", 'w') as file:
-                    stats = [f"{r} - {len(files)}\n" for r,
-                             _, files in os.walk(f"./{cur_dir}")]
-                    review_number = sum(
-                        [int(st.split()[-1]) if st.find("review_gallery") != -1 else 0 for st in stats])
-                    showcase_number = sum(
-                        [int(st.split()[-1]) if st.find("showcase") != -1 else 0 for st in stats])
-                    stats.append(f"review all - {review_number}\n")
-                    stats.append(f"showcase all - {showcase_number}\n")
-                    file.writelines(stats[1:])
+                    extension_index = src.rfind('.')
+                    filename = f"{cur_dir}/{image_type}/{category}/{item_id}_sample_{i + 1}.{src[extension_index + 1:]}"
 
-                extension_index = src.rfind('.')
-                filename = f"{cur_dir}/{image_type}/{category}/sample_{i + 1}.{src[extension_index + 1:]}"
+                    img_data = requests.get(src).content
 
-                img_data = requests.get(src).content
+                    with open(filename, 'wb') as handler:
+                        handler.write(img_data)
 
-                with open(filename, 'wb') as handler:
-                    handler.write(img_data)
+                    with open("logs/stats.log", 'w') as file:
+                        stats = [f"{r} - {len(files)}\n" for r,
+                                _, files in os.walk(f"./{cur_dir}")]
+                        review_number = sum(
+                            [int(st.split()[-1]) if st.find("review_gallery") != -1 else 0 for st in stats])
+                        showcase_number = sum(
+                            [int(st.split()[-1]) if st.find("showcase") != -1 else 0 for st in stats])
+                        stats.append(f"review all - {review_number}\n")
+                        stats.append(f"showcase all - {showcase_number}\n")
+                        file.writelines(stats[1:])
+
+                    with open(f"logs/{category}_{image_type}_stats_log.txt", 'a') as handler:
+                        handler.write(f"{i} {src}\n")
 
 
 a = WildberriesParser()
