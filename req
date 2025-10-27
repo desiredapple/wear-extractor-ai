@@ -1,0 +1,3 @@
+pip install invisible_watermark transformers accelerate safetensors
+uc
+chromium
