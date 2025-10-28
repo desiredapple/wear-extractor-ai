@@ -1,12 +1,15 @@
-all: parse_wb parse_lamoda
+all: main
+
+main:
+	~/anaconda3/bin/python ./src/main.py
 
 parse_wb:
-	~/anaconda3/bin/python ./src/parser_wildberries.py
+	~/anaconda3/bin/python ./src/parser/parser_wildberries.py
 
 parse_lamoda:
-	~/anaconda3/bin/python ./src/parser_lamoda.py
+	~/anaconda3/bin/python ./src/parser/parser_lamoda.py
 
-rebuild: rm all
+rebuild: clean all
 
 install:
 	pip install -r req
