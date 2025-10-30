@@ -15,4 +15,4 @@ install:
 	pip install -r req
 
 clean:
-	rm -rfd data logs
+	rm -rfd data logs src/parser/__pycache__
